@@ -1,4 +1,4 @@
-var logos = {
+const logos = {
   star:
     'M14.615,4.928c0.487-0.986,1.284-0.986,1.771,0l2.249,4.554c0.486,0.986,1.775,1.923,2.864,2.081l5.024,0.73c1.089,0.158,1.335,0.916,0.547,1.684l-3.636,3.544c-0.788,0.769-1.28,2.283-1.095,3.368l0.859,5.004c0.186,1.085-0.459,1.553-1.433,1.041l-4.495-2.363c-0.974-0.512-2.567-0.512-3.541,0l-4.495,2.363c-0.974,0.512-1.618,0.044-1.432-1.041l0.858-5.004c0.186-1.085-0.307-2.6-1.094-3.368L3.93,13.977c-0.788-0.768-0.542-1.525,0.547-1.684l5.026-0.73c1.088-0.158,2.377-1.095,2.864-2.081L14.615,4.928z',
   apple:
@@ -6,65 +6,56 @@ var logos = {
   glasses:
     'M14.075,9.531c0,0-2.705-1.438-5.158-1.438c-2.453,0-4.862,0.593-4.862,0.593L3.971,9.869c0,0,0.19,0.19,0.528,0.53c0.338,0.336,0.486,3.741,1.838,5.094c1.353,1.354,4.82,1.396,5.963,0.676c1.14-0.718,2.241-3.466,2.241-4.693c0-0.38,0-0.676,0-0.676c0.274-0.275,1.615-0.303,1.917,0c0,0,0,0.296,0,0.676c0,1.227,1.101,3.975,2.241,4.693c1.144,0.72,4.611,0.678,5.963-0.676c1.355-1.353,1.501-4.757,1.839-5.094c0.338-0.34,0.528-0.53,0.528-0.53l-0.084-1.183c0,0-2.408-0.593-4.862-0.593c-2.453,0-5.158,1.438-5.158,1.438C16.319,9.292,14.737,9.32,14.075,9.531z'
 }
-var groupLogo = {
+const groupLogo = {
   1: logos.star,
   2: logos.apple
 }
 
-var width = 960,
-  height = 500
+const width = 960
+const height = 500
 
-var svg = d3
+const svg = d3
   .select('body')
   .append('svg')
   .attr('width', width)
   .attr('height', height)
 
-var color = d3.scaleOrdinal(d3.schemeCategory20)
+const color = d3.scaleOrdinal(d3.schemeCategory20)
 
-var simulation = d3
+const simulation = d3
   .forceSimulation()
-  .force(
-    'link',
-    d3.forceLink().id(function(d) {
-      return d.id
-    })
-  )
+  .force('link', d3.forceLink().id(d => d.id))
   .force('charge', d3.forceManyBody())
   .force('center', d3.forceCenter(width / 2, height / 2))
 
-d3.json('miserables.json', function(error, graph) {
+d3.json('miserables.json', (error, graph) => {
   // add an id to each node
   graph.nodes.forEach((node, i) => {
     node.id = i
   })
 
-  var linkG = svg
+  const linkG = svg
     .append('g')
     .attr('class', 'links')
     .selectAll('line')
     .data(graph.links)
     .enter()
     .append('line')
-    .style('stroke-width', function(d) {
-      return Math.sqrt(d.value)
-    })
+    .style('stroke-width', d => Math.sqrt(d.value))
 
-  var nodeG = svg
+  const nodeG = svg
     .append('g')
     .attr('class', 'nodes')
     .selectAll('path')
     .data(graph.nodes)
     .enter()
     .append('path')
-    .attr('d', function(d) {
+    .attr('d', d => {
       if (d.group in groupLogo) return groupLogo[d.group]
       return logos.glasses
     })
     .attr('transform', 'scale(0.75)')
-    .style('fill', function(d) {
-      return color(d.group)
-    })
+    .style('fill', d => color(d.group))
     .call(
       d3
         .drag()
@@ -73,9 +64,7 @@ d3.json('miserables.json', function(error, graph) {
         .on('end', dragended)
     )
 
-  nodeG.append('title').text(function(d) {
-    return d.name
-  })
+  nodeG.append('title').text(d => d.name)
 
   simulation.nodes(graph.nodes).on('tick', ticked)
 
@@ -83,22 +72,12 @@ d3.json('miserables.json', function(error, graph) {
 
   function ticked() {
     linkG
-      .attr('x1', function(d) {
-        return d.source.x
-      })
-      .attr('y1', function(d) {
-        return d.source.y
-      })
-      .attr('x2', function(d) {
-        return d.target.x
-      })
-      .attr('y2', function(d) {
-        return d.target.y
-      })
+      .attr('x1', d => d.source.x)
+      .attr('y1', d => d.source.y)
+      .attr('x2', d => d.target.x)
+      .attr('y2', d => d.target.y)
 
-    nodeG.attr('transform', function(d) {
-      return 'translate(' + (d.x - 12) + ',' + (d.y - 12) + ')'
-    })
+    nodeG.attr('transform', d => `translate(${d.x - 12},${d.y - 12})`)
   }
 
   function dragstarted(d) {
