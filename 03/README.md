@@ -1,4 +1,4 @@
-updated to d3v4
+updated to d3v4, modern js, and [prettier](https://prettier.io) formatted
 
 ---
 
